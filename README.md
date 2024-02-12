@@ -1,5 +1,5 @@
 # Wiring Guide
-[https://cdn-learn.adafruit.com/downloads/pdf/32x16-32x32-rgb-led-matrix.pdf](url)
+See PDF 
 This has a lot of the info you need to know to wire it
 # Design
 I Wanted to make a real time accurate clock that could display a message and still keep track of the time in the background
