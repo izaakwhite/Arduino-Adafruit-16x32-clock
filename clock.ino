@@ -12,12 +12,14 @@
 #include <RGBmatrixPanel.h>
 #include <string.h>
 
-#define CLK  11  
 #define OE   9
 #define LAT 10
+#define CLK  11 
 #define A   A0
 #define B   A1
 #define C   A2
+
+#define BUTTON 20
 
 RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
 
@@ -78,7 +80,6 @@ String getTime(const uint8_t &hour,const uint8_t &minute,const uint8_t &second){
   str += String(second);
   
   return str;
-  
 }
 
 String getTime(const uint8_t &hour,const uint8_t &minute){
@@ -95,9 +96,8 @@ String getTime(const uint8_t &hour,const uint8_t &minute){
   return str;
 }
 
-
-
 DateTime today(2, 11, 3, 15, 1, 0, "2/11");
+byte count = 0;
 
 void setup() {
   //NeedDS3231 for RTC can update struct from this
@@ -106,7 +106,6 @@ void setup() {
 
 void loop() {
   uint32_t t1 = millis(); //Used to track millisecond delays as the arduino takes time to proccess instructions
-  String date = today.date;
   today.second++;
   if(today.second==60){
     today.second = 0;
@@ -121,7 +120,7 @@ void loop() {
     today.hour = 1;
   }
   if(today.trueHour==25){
-    date = today.updateDate();
+    today.updateDate();
     today.trueHour=0;
   }
   String second_accurate_time=getTime(today.hour,today.minute,today.second);
@@ -130,16 +129,32 @@ void loop() {
   matrix.setCursor(0, 0);  
   matrix.setTextSize(1);
   matrix.setTextColor(matrix.Color333(7,7,7));
-  //code to check button state based on running counter
-  //if(buttonState==HIGH)
-  //  count++;
-  //if(count%4==(VAL))
-  //  matrix.print(USERCHOICE)
-  matrix.print(second_accurate_time);
-  matrix.setCursor(0,8);
-  //matrix.print(date);
-  //depending on button state I plan on implementing, second accurate & date accurate time
-  //as well as military time 
+  
+  byte button_state = digitalRead(BUTTON);
+  if(button_state==HIGH){
+    count++;
+  }
+  switch(count%4){
+    case 0:
+      matrix.print(second_accurate_time);
+      count = 0;
+      break;
+    case 1:
+      matrix.print(minute_accurate_time);
+      matrix.setCursor(0,8);
+      matrix.print(today.date);
+      break;
+    case 2:
+      matrix.print(military_time);
+      matrix.setCursor(0,8);
+      matrix.print(today.date);
+      break;
+    case 3:
+      matrix.print("I <3");
+      matrix.setCursor(6,8);
+      matrix.print("C++");
+      break;
+  }
   uint32_t t2  = millis();
   delay(1000-(t2-t1)+1);
   matrix.fillScreen(matrix.Color333(0,0,0));
