@@ -19,9 +19,9 @@
 #define B   A1
 #define C   A2
 
-#define BUTTON 20
+#define BUTTON 53 
 
-RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
+RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, true);
 
 struct DateTime {
   uint8_t month;
@@ -96,16 +96,18 @@ String getTime(const uint8_t &hour,const uint8_t &minute){
   return str;
 }
 
-DateTime today(2, 11, 3, 15, 1, 0, "2/11");
+DateTime today(2, 25, 11, 11, 20, 10, "2/25");
 byte count = 0;
 
 void setup() {
   //NeedDS3231 for RTC can update struct from this
   matrix.begin();
+  matrix.fillScreen(0);
 }
 
 void loop() {
   uint32_t t1 = millis(); //Used to track millisecond delays as the arduino takes time to proccess instructions
+  matrix.fillScreen(0);
   today.second++;
   if(today.second==60){
     today.second = 0;
@@ -126,6 +128,7 @@ void loop() {
   String second_accurate_time=getTime(today.hour,today.minute,today.second);
   String military_time = getTime(today.trueHour, today.minute);
   String minute_accurate_time = getTime(today.hour, today.minute);
+
   matrix.setCursor(0, 0);  
   matrix.setTextSize(1);
   matrix.setTextColor(matrix.Color333(7,7,7));
@@ -155,7 +158,7 @@ void loop() {
       matrix.print("C++");
       break;
   }
+  matrix.swapBuffers(false);
   uint32_t t2  = millis();
-  delay(1000-(t2-t1)+1);
-  matrix.fillScreen(matrix.Color333(0,0,0));
+  delay(1000-(t2-t1));
 }
